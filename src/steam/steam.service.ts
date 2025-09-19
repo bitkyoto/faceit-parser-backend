@@ -1,19 +1,20 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SteamService {
-  private steamApiKey = '2C1A32718ECA4A663219E3BE809E1074';
-
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
   /**
    * Извлекает SteamID64 из Steam URL используя Steam Web API
    */
   async extractSteamId64FromUrl(url: string): Promise<string> {
     try {
       const normalizedUrl = this.normalizeSteamUrl(url);
-
       // Если URL уже содержит SteamID64
       if (normalizedUrl.includes('/profiles/')) {
         return this.extractFromProfileUrl(normalizedUrl);
@@ -86,7 +87,7 @@ export class SteamService {
           'https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/',
           {
             params: {
-              key: this.steamApiKey,
+              key: this.configService.get<string>('steamApiKey'),
               vanityurl: vanityUrl,
             },
           },

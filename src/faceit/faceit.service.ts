@@ -1,11 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, HttpException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class FaceitService {
-  constructor(private readonly httpService: HttpService) {}
-  private apiKey = '4757e873-b198-4de4-849c-f079b3be5f95';
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async getStats(player_id: string) {
     try {
@@ -13,7 +16,9 @@ export class FaceitService {
         this.httpService.get(
           `https://open.faceit.com/data/v4/players/${player_id}/games/cs2/stats?limit=100`,
           {
-            headers: { Authorization: `Bearer ${this.apiKey}` },
+            headers: {
+              Authorization: `Bearer ${this.configService.get<string>('faceitApiKey')}`,
+            },
           },
         ),
       );
@@ -35,7 +40,9 @@ export class FaceitService {
         this.httpService.get(
           `https://open.faceit.com/data/v4/players?nickname=${encodeURIComponent(nickname)}`,
           {
-            headers: { Authorization: `Bearer ${this.apiKey}` },
+            headers: {
+              Authorization: `Bearer ${this.configService.get<string>('faceitApiKey')}`,
+            },
           },
         ),
       );
@@ -62,7 +69,9 @@ export class FaceitService {
         this.httpService.get(
           `https://open.faceit.com/data/v4/players?game=cs2&game_player_id=${steamId}`,
           {
-            headers: { Authorization: `Bearer ${this.apiKey}` },
+            headers: {
+              Authorization: `Bearer ${this.configService.get<string>('faceitApiKey')}`,
+            },
           },
         ),
       );
