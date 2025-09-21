@@ -74,26 +74,33 @@ export class FaceitController {
       throw new BadRequestException('Ошибка при получении статистики');
     }
   }
+  @Get('mapstats/:player_id')
+  async getStatsByMap(@Param('player_id') player_id: string) {
+    try {
+      return await this.faceitService.getStatsByMap(player_id);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException('Ошибка при получении статистики');
+    }
+  }
 
-  /**
-   * Вспомогательные методы
-   */
   private detectInputType(
     identifier: string,
   ): 'steamId64' | 'steamUrl' | 'nickname' | 'faceitPlayerId' {
     const cleanIdentifier = identifier.trim();
-
-    // Проверяем на FACEIT player_id (UUID)
     if (this.isFaceitPlayerId(cleanIdentifier)) {
       return 'faceitPlayerId';
     }
 
-    // Проверяем на SteamID64 (17 цифр)
     if (/^\d{17}$/.test(cleanIdentifier)) {
       return 'steamId64';
     }
 
-    // Проверяем на Steam URL
     if (
       cleanIdentifier.includes('steamcommunity.com') ||
       cleanIdentifier.includes('steam://') ||
@@ -101,13 +108,10 @@ export class FaceitController {
     ) {
       return 'steamUrl';
     }
-
-    // По умолчанию считаем ником
     return 'nickname';
   }
 
   private isFaceitPlayerId(identifier: string): boolean {
-    // FACEIT player_id обычно UUID формата
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
       identifier,
     );
