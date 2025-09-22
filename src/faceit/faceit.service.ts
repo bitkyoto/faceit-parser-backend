@@ -56,7 +56,6 @@ export class FaceitService {
       if (!response.data || !response.data.player_id) {
         throw new NotFoundException('Игрок с таким ником не найден');
       }
-
       return response.data;
     } catch (error) {
       if (error.response?.status === 404) {
