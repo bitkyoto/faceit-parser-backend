@@ -74,6 +74,20 @@ export class FaceitController {
       throw new BadRequestException('Ошибка при получении статистики');
     }
   }
+  @Get('games/:player_id')
+  async getGames(@Param('player_id') player_id: string) {
+    try {
+      return await this.faceitService.getGames(player_id);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException('Ошибка при получении статистики');
+    }
+  }
   @Get('mapstats/:player_id')
   async getStatsByMap(@Param('player_id') player_id: string) {
     try {
