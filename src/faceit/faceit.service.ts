@@ -208,4 +208,33 @@ export class FaceitService {
       );
     }
   }
+  async getLeaderboard(region: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `https://open.faceit.com/data/v4/rankings/games/cs2/regions/${region}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.configService.get<string>('faceitApiKey')}`,
+            },
+            params: {
+              limit: 100,
+            },
+          },
+        ),
+      );
+      if (!response.data) {
+        throw new NotFoundException('Статистика этого игрока не существует');
+      }
+      return response.data.items;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new NotFoundException('Статистика игрока не найдена');
+      }
+      throw new HttpException(
+        error.response?.data?.message || 'Failed to fetch FACEIT map stats',
+        error.response?.status || 500,
+      );
+    }
+  }
 }

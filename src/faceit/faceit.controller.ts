@@ -102,7 +102,20 @@ export class FaceitController {
       throw new BadRequestException('Ошибка при получении статистики');
     }
   }
-
+  @Get('leaderboard')
+  async getLeaderboard(@Query('region') region: string) {
+    try {
+      return await this.faceitService.getLeaderboard(region);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException('Ошибка при получении статистики');
+    }
+  }
   private detectInputType(
     identifier: string,
   ): 'steamId64' | 'steamUrl' | 'nickname' | 'faceitPlayerId' {
